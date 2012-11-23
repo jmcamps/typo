@@ -71,27 +71,24 @@ class Article < Content
       self.settings = {}
     end
   end
-def merge_with(id)
-      begin 
+  
+  def merge_with(id)
+    begin              
         article_to_merge = Article.find(id)
-      rescue 
-        raise Exception.new("Article to merge not exists")
-      end
-      
-      self.body += article_to_merge.body     
-      
-      puts article_to_merge.comments.length
-      article_to_merge.comments.each { |comment|      
-        self.comments << comment  
-      }      
-      
-      article_to_merge.comments.destroy
-      
-      article_to_merge.reload
-      
-      self.save!
-      article_to_merge.destroy    
-    end
+        self.body += article_to_merge.body
+        article_to_merge.comments.each { |comment|      
+          self.comments << comment   
+        }
+        self.save!
+        article_to_merge.comments.destroy
+        article_to_merge.reload
+        article_to_merge.destroy               
+    rescue Exception => ex  
+      puts ex.message    
+      raise Exception.new("Unexpected error merging articles. Merge aborted")
+    end             
+  end
+  
   def set_permalink
     return if self.state == 'draft'
     self.permalink = self.title.to_permalink if self.permalink.nil? or self.permalink.empty?

@@ -634,16 +634,15 @@ describe Article do
   describe "merge_with operation" do
     
     before :each do
-      @first_article = Article.get_or_build_article      
+      @first_article = Factory(:article)            
       @first_article.title = "First title"
       @first_article.body = "First body"
       first_comment = Factory(:comment, :id => 10)
       first_comment.body = "First comment"      
       @first_article.comments << first_comment
-      @second_article = Article.get_or_build_article
+      @second_article = Factory(:article)
       @second_article.title = "Second title"
-      @second_article.body = "Second body"
-      @second_article.id = 3
+      @second_article.body = "Second body"      
       second_comment = Factory(:comment, :id => 11)
       second_comment.body = "Second comment"
       @second_article.comments << second_comment      
@@ -652,29 +651,44 @@ describe Article do
     end
      
     it "shold raise Exception if article to merge not exists" do
-      lambda { @first_article.merge_with(4) }.
+      lambda { @first_article.merge_with(4000) }.
         should raise_error
     end
     
     it "should leave the title unchanged" do            
-      @first_article.merge_with(3)
+      @first_article.merge_with(@second_article.id)
       @first_article.title.should be == "First title"
     end
     
     it "should merge the two bodies" do            
-      @first_article.merge_with(3)
+      @first_article.merge_with(@second_article.id)
       @first_article.body.should be == "First body" + "Second body"
     end
     
-    it "should copy all comments in merged article" do
-      
-      @first_article.merge_with(3)
+    it "should copy all comments in merged article" do      
+      @first_article.merge_with(@second_article.id)
       @first_article.comments.length.should be == 2
     end
+      
+    it "should delete second article" do
+      @first_article.merge_with(@second_article.id)
+      Article.find_by_id(@second_article.id).should be nil
+    end
+            
+    it "merge_with should be transactional"
+      # prepare
+      #fake_article = Factory(:article)
+      #puts fake_article.id
+      #Article.stub(:find).with(@first_article.id).and_return(@first_article)
+      #Article.stub(:find).with(fake_article.id).and_return(fake_article)      
+      #fake_article.should_receive(:destroy).and_raise(Exception.new("Some exception"))
+      
+      # act & verify exception
+      #lambda { @first_article.merge_with(fake_article.id) }.should raise_error
+      
+      # verify
+      #@first_article.body.should be == "First body"
     
-   
-    
-    it "should delete second article"
   end
 end
 

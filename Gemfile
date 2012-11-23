@@ -56,4 +56,7 @@ group :development, :test do
   gem 'cucumber-rails-training-wheels'
   gem 'database_cleaner'
   gem 'capybara'
+  gem 'autotest-rails'  
+  gem 'ZenTest'
+  gem 'i18n'
 end
