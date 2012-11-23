@@ -60,7 +60,8 @@ class Article < Content
   scope :published_at, lambda {|time_params| { :conditions => { :published => true, :published_at => Article.time_delta(*time_params) }, :order => 'published_at DESC' } }
 
   setting :password,                   :string, ''
-
+  
+  
   def initialize(*args)
     super
     # Yes, this is weird - PDC
@@ -70,7 +71,27 @@ class Article < Content
       self.settings = {}
     end
   end
-
+def merge_with(id)
+      begin 
+        article_to_merge = Article.find(id)
+      rescue 
+        raise Exception.new("Article to merge not exists")
+      end
+      
+      self.body += article_to_merge.body     
+      
+      puts article_to_merge.comments.length
+      article_to_merge.comments.each { |comment|      
+        self.comments << comment  
+      }      
+      
+      article_to_merge.comments.destroy
+      
+      article_to_merge.reload
+      
+      self.save!
+      article_to_merge.destroy    
+    end
   def set_permalink
     return if self.state == 'draft'
     self.permalink = self.title.to_permalink if self.permalink.nil? or self.permalink.empty?
@@ -95,6 +116,10 @@ class Article < Content
   include Article::States
 
   class << self
+    
+    
+    
+    
     def last_draft(article_id)
       article = Article.find(article_id)
       while article.has_child?

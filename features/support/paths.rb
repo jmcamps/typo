@@ -15,9 +15,19 @@ module NavigationHelpers
 
     when /^the home\s?page$/
       '/'
+    when /^the admin home\s?page$/
+      '/admin'
+     when /^the admin content page$/
+      '/admin/content'
     when /^the new article page$/
       '/admin/content/new'
-
+    when /^the show article (.*) page$/
+      article_path($1)    
+    when /^the comments feewdback for article (.*) page$/
+      feedback_path($1)
+    when /^the (.*) article (.*)$/
+      content_path($1, $2)      
+    
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #
@@ -34,6 +44,18 @@ module NavigationHelpers
           "Now, go and add a mapping in #{__FILE__}"
       end
     end
+  end
+  
+  def content_path(action, id)
+    "/admin/content/#{action}/#{id}" 
+  end
+  
+  def article_path(id)
+    "/article/show/#{id}" 
+  end
+  
+  def feedback_path(id)
+    "/admin/feedback/article/#{id}" 
   end
 end
 

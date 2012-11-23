@@ -35,12 +35,14 @@ Given /^the blog is set up$/ do
   Blog.default.update_attributes!({:blog_name => 'Teh Blag',
                                    :base_url => 'http://localhost:3000'});
   Blog.default.save!
+ 
   User.create!({:login => 'admin',
                 :password => 'aaaaaaaa',
                 :email => 'joe@snow.com',
                 :profile_id => 1,
                 :name => 'admin',
                 :state => 'active'})
+                
 end
 
 And /^I am logged into the admin panel$/ do
@@ -54,6 +56,7 @@ And /^I am logged into the admin panel$/ do
     assert page.has_content?('Login successful')
   end
 end
+
 
 # Single-line step scoper
 When /^(.*) within (.*[^:])$/ do |step, parent|

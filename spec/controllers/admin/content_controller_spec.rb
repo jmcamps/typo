@@ -120,7 +120,7 @@ describe Admin::ContentController do
         result.parent_id.should be_nil
         result.redirects.count.should == 0
       end
-    end
+    end       
 
     describe "for a published article" do
       before :each do
@@ -671,4 +671,85 @@ describe Admin::ContentController do
 
     end
   end
+  
+  # Specs for Merge
+  describe 'merge funtionality tests' do
+    
+    before :each do
+      Factory(:blog)
+      Factory(:article, :id => 1)
+      Factory(:article, :id => 2)     
+    end
+    
+    def set_session_publisher 
+      Profile.delete_all
+      publisher = Factory(:user, :login => 'publisher', :profile => Factory(:profile_publisher, :label => "publisher"))
+      request.session = { :user => publisher.id }          
+    end
+      
+    def set_session_admin
+      Profile.delete_all
+      admin = Factory(:user, :login => 'admin', :profile => Factory(:profile_admin, :label => Profile::ADMIN))      
+      request.session = { :user => admin.id }
+    end   
+    
+    it 'should redirect to content index if user is not admin' do                
+      set_session_publisher    
+      post(:merge, 'id' => 1, 'merge_with' => 2)
+      response.should redirect_to(:action => 'index')              
+    end
+    
+    it 'should put an error in flash if user is not admin' do
+      set_session_publisher  
+      post(:merge, 'id' => 1, 'merge_with' => 2)
+      assert_equal 'Error, you are not allowed to perform this action', flash[:error]      
+    end 
+    
+    it 'should put an error in flash if original article not exists' do
+      set_session_admin            
+      post(:merge, 'id' => 3, 'merge_with' => 2)
+      assert_equal 'Error, original article not exists', flash[:error]
+    end
+       
+    it 'should call merge_with method on original article' do
+      set_session_admin  
+      fake_article = Factory(:article)   
+      Article.stub(:find).with(1).and_return(fake_article) 
+      fake_article.should_receive(:merge_with).with(2)      
+      post(:merge, 'id' => 1, 'merge_with' => 2)                
+    end
+    
+    it 'should redirect to content index if result is correct' do
+      set_session_admin      
+      post(:merge, 'id' => 1, 'merge_with' => 2)
+      response.should redirect_to(:action => 'index')  
+    end
+    
+    it 'should put a notice in flash if result is correct' do
+      set_session_admin 
+      post(:merge, 'id' => 1, 'merge_with' => 2)
+      assert_equal 'Articles were successfully merged.', flash[:notice]
+    end
+    
+    it 'slould put an error in flash if merge_with throws an exception' do
+      set_session_admin 
+      fake_article = Factory(:article)   
+      Article.stub(:find).with(1).and_return(fake_article) 
+      fake_article.should_receive(:merge_with).with(2).and_raise(Exception.new("Some exception"))
+      post(:merge, 'id' => 1, 'merge_with' => 2)
+      assert_equal 'Some exception', flash[:error]
+    end
+    
+    it 'slould redirect to edit if merge_with throws an exception' do
+      set_session_admin 
+      fake_article = Factory(:article, :id => 3)   
+      Article.stub(:find).with(3).and_return(fake_article) 
+      fake_article.should_receive(:merge_with).with(2).and_raise(Exception.new("Some exception"))
+      post(:merge, 'id' => 3, 'merge_with' => 2)
+      response.should redirect_to(:action => 'edit', :id => 3)
+    end
+           
+  end
+  
+  
 end

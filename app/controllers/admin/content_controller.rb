@@ -23,6 +23,36 @@ class Admin::ContentController < Admin::BaseController
     end
   end
 
+  def merge    
+    unless current_user.admin?      
+      redirect_to_index_with_error_in_flash "Error, you are not allowed to perform this action"
+      return
+    end
+      
+    begin
+      @article = Article.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      redirect_to_index_with_error_in_flash "Error, original article not exists"
+      return
+    end    
+    
+    begin
+      @article.merge_with(params[:merge_with])
+    rescue Exception => ex
+      redirect_to_edit_with_error_in_flash ex.message
+      return
+    end    
+       
+    if @article.save
+        #
+        
+        destroy_the_draft unless @article.draft        
+        set_the_flash
+        return(redirect_to :action => 'index')        
+      end
+    return          
+  end
+  
   def new
     new_or_edit
   end
@@ -189,9 +219,21 @@ class Admin::ContentController < Admin::BaseController
       flash[:notice] = _('Article was successfully created')
     when 'edit'
       flash[:notice] = _('Article was successfully updated.')
+    when 'merge'
+      flash[:notice] = _('Articles were successfully merged.')
     else
       raise "I don't know how to tidy up action: #{params[:action]}"
     end
+  end
+  
+  def redirect_to_index_with_error_in_flash(message)    
+    flash[:error] = _(message)
+    redirect_to :action => 'index'
+  end
+  
+  def redirect_to_edit_with_error_in_flash(message)        
+      flash[:error] = _(message)
+      redirect_to :action => :edit, :id => @article.id
   end
 
   def destroy_the_draft
@@ -239,5 +281,5 @@ class Admin::ContentController < Admin::BaseController
 
   def setup_resources
     @resources = Resource.by_created_at
-  end
+  end  
 end

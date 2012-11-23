@@ -630,5 +630,51 @@ describe Article do
     end
 
   end
+  
+  describe "merge_with operation" do
+    
+    before :each do
+      @first_article = Article.get_or_build_article      
+      @first_article.title = "First title"
+      @first_article.body = "First body"
+      first_comment = Factory(:comment, :id => 10)
+      first_comment.body = "First comment"      
+      @first_article.comments << first_comment
+      @second_article = Article.get_or_build_article
+      @second_article.title = "Second title"
+      @second_article.body = "Second body"
+      @second_article.id = 3
+      second_comment = Factory(:comment, :id => 11)
+      second_comment.body = "Second comment"
+      @second_article.comments << second_comment      
+      @first_article.save!
+      @second_article.save!
+    end
+     
+    it "shold raise Exception if article to merge not exists" do
+      lambda { @first_article.merge_with(4) }.
+        should raise_error
+    end
+    
+    it "should leave the title unchanged" do            
+      @first_article.merge_with(3)
+      @first_article.title.should be == "First title"
+    end
+    
+    it "should merge the two bodies" do            
+      @first_article.merge_with(3)
+      @first_article.body.should be == "First body" + "Second body"
+    end
+    
+    it "should copy all comments in merged article" do
+      
+      @first_article.merge_with(3)
+      @first_article.comments.length.should be == 2
+    end
+    
+   
+    
+    it "should delete second article"
+  end
 end
 

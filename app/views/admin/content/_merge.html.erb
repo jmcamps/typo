@@ -1,0 +1,10 @@
+<div>
+  <h4><%= _("Merge") %></h4>
+  <p class='help-block'>You are able to merge this article with another. If you want to merge the article, please, specify the article's ID.</p>
+  <%= form_tag(:controller => "content", :action => "merge", :id => @article.id) do %>
+  
+  <%= text_field_tag :merge_with %>
+  
+  <%= submit_tag(_("Merge"), {:class => 'btn'}) %>
+  <% end %>
+</div>
