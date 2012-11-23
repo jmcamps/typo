@@ -25,10 +25,26 @@ Feature: Merge Articles
     And I go to the comments feewdback for article 3 page
     Then I should see "Admin comment"  
   
+  Scenario: Merge articles should leave the title from the first article 
+    Given I merge article 3 with article 4   
+    And I go to the edit article 3 	  	    
+  	And I should see "Admin article"   	
+  	And I should not see "Publisher article"
+  
   Scenario: Merge articles should merge two bodies in the first article 
     Given I merge article 3 with article 4   
     And I go to the edit article 3 	  	    
   	And I should see "Body for admin article"   	
   	And I should see "Body for publisher article"
+  
+  Scenario: Merge articles should copy all comments from second article to the first article 
+    Given I merge article 3 with article 4   
+    And I go to the edit article 3 	  	    
+  	And I should see "Admin comment"   	
+  	And I should see "Publisher comment"
   	
+  Scenario: Merge articles should delete second article 
+    Given I merge article 3 with article 4   
+    And I go to the edit article 4 	  	    
+  	And I should see "Not found"   	  	
   	

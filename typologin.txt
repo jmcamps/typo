@@ -1,0 +1,9 @@
+Local:
+*****************
+Login: admin
+Password: yPfBYxO 
+
+Heroku:
+*****************
+Login: admin
+Password: 3N86jqV 
