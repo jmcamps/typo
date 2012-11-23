@@ -674,7 +674,11 @@ describe Article do
       @first_article.merge_with(@second_article.id)
       Article.find_by_id(@second_article.id).should be nil
     end
-            
+    
+    it "tx" do
+      @first_article.tx_demo
+      @first_article.title.should_not be == "k"
+    end        
     it "merge_with should be transactional"
       # prepare
       #fake_article = Factory(:article)

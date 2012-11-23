@@ -1,7 +1,7 @@
 Feature: Merge Articles
   As a blog administrator
-  In order to unify contents on the same topic
-  I want to be able to merge the current article with another
+  In order to coategorize articles
+  I want to be able to create and edit cateogries
 
   Background:    
 	Given the blog data is published

@@ -72,6 +72,14 @@ class Article < Content
     end
   end
   
+  def tx_demo
+    Article.transaction do 
+      self.title = "k"
+      self.save!
+      #raise "Error" 
+    end       
+  end
+  
   def merge_with(id)
     begin              
         article_to_merge = Article.find(id)
