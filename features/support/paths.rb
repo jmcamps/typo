@@ -17,7 +17,7 @@ module NavigationHelpers
       '/'
     when /^the admin home\s?page$/
       '/admin'
-     when /^the admin content page$/
+    when /^the admin content page$/
       '/admin/content'
     when /^the new article page$/
       '/admin/content/new'
@@ -26,7 +26,9 @@ module NavigationHelpers
     when /^the comments feewdback for article (.*) page$/
       feedback_path($1)
     when /^the (.*) article (.*)$/
-      content_path($1, $2)      
+      content_path($1, $2)
+    when /^the new category page$/
+      '/admin/categories/new'      
     
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
